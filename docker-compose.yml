@@ -1,0 +1,12 @@
+version: "3.9"
+services:
+  node1:
+    build: node
+    ports:
+      - "4949:4949"
+  master:
+    build: master
+    ports:
+      - "80:80"
+    depends_on:
+      - "node1"
