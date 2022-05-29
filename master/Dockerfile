@@ -10,4 +10,4 @@ COPY munin.conf /etc/munin/munin.conf
 
 RUN chown -R munin:munin /var/run/munin
 RUN chmod 0644 /etc/cron.d/munin
-CMD munin-node && runuser -u munin -- munin-cron && cron && apachectl start && tail -F /dev/null
+CMD runuser -u munin -- munin-cron && cron && apachectl start && tail -F /dev/null
