@@ -1,0 +1,70 @@
+#!/usr/bin/env python3
+import sys
+
+
+class TCPConnectionsPlugin:
+    ESTABLISHED = 1
+
+    """
+        Plugin return number of established TCP connections.
+    """
+    def __init__(self, args, argv):
+        self._args = args
+        self._argv = argv
+
+    """
+        Method prints munin config.
+    """
+    def _print_config(self):
+        print("graph_title Established TCP connections\n"
+              "graph_category network\n"
+              "tcpconnections.label Established")
+
+    def process_args(self):
+        if self._argv[1] == "config":
+            self._print_config()
+        elif self._argv[1] == "autoconf":
+            print("no")
+        else:
+            print("USAGE")
+
+    """
+        Established connections could be recognized by state == 1.
+        This plugin keeps track of established conns, so there is no
+        reason to handle all the other states.
+    """
+    def _get_connection_state(self, connection_line):
+        cols = connection_line.split()
+        try:
+            return int(cols[3])
+        except ValueError:
+            return 0
+
+    """
+        Method reads `/proc/net/tcp` where each line represents 
+        single TCP connection.
+    """
+    def print_stats(self):
+        established_conns = 0
+        try:
+            with open("/proc/net/tcp", "r") as file:
+                line = file.readline()
+                while line:
+                    line = file.readline()
+                    if self._get_connection_state(line) == self.ESTABLISHED:
+                        established_conns += 1
+        except:
+            pass
+
+        print(f"tcpconnections.value {established_conns}")
+
+    def main(self):
+        if self._args > 1:
+            self.process_args()
+        else:
+            self.print_stats()
+
+
+if __name__ == "__main__":
+    plugin = TCPConnectionsPlugin(len(sys.argv), sys.argv)
+    plugin.main()
