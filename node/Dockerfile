@@ -11,4 +11,4 @@ COPY tcpconnections /usr/share/munin/plugins/tcpconnections
 RUN ln -s /usr/share/munin/plugins/tcpconnections /etc/munin/plugins/tcpconnections && \
     printf "[tcpconnections]\nuser root\n" >> /etc/munin/plugin-conf.d/munin-node
 
-CMD munin-node && tail -F /dev/null
+CMD rm -f /var/run/munin/munin-node.pid && munin-node && tail -F /dev/null
